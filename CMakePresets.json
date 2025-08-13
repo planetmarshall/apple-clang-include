@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "binaryDir": "${sourceDir}/build/",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+	"CMAKE_FIND_PACKAGE_PREFER_CONFIG": true,
+	"CMAKE_PREFIX_PATH": "${sourceDir}/build/conan",
+	"CMAKE_C_COMPILER": "/usr/bin/clang",
+	"CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+      }
+    }
+  ]
+}

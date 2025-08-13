@@ -1,0 +1,60 @@
+name: Build
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CLICOLOR_FORCE: 1
+  CMAKE_COLOR_DIAGNOSTICS: ON
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: prerequisites
+        run: |
+          pip install conan
+
+      - name: checkout googletest
+        run: |
+          git clone https://github.com/google/googletest.git
+
+      - name: build and install googletest
+        working-directory: googletest
+        run: |
+          cmake . -B build -G Ninja
+          sudo cmake --build build --target install
+
+      - name: patch googletest
+        run: |
+          echo '#pragma GCC error "system include"' | sudo tee -a /usr/local/include/gtest/gtest.h
+
+
+      - name: Install and build packages
+        run: |
+          conan profile detect
+          conan install . -of build/conan --build missing -s build_type=Debug
+
+      - name: Configure cmake
+        run: |
+          cmake --preset default
+
+      - name: Build with cmake
+        run: |
+          cmake --build build --verbose
+
